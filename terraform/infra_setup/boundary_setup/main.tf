@@ -47,7 +47,7 @@ locals {
     [Service]
     ProtectSystem=off
     ExecStart=
-    ExecStart=/usr/bin/boundary-worker server -config=/etc/boundary.d/boundary-pki-worker-config.hcl
+    ExecStart=/usr/bin/boundary server -config=/etc/boundary.d/boundary-pki-worker-config.hcl
     WORKER_UNIT_DROPIN
 
   boundary_instance_worker_config = <<-WORKER_CONFIG
