@@ -13,12 +13,6 @@ terraform {
   }
 }
 
-# data "aws_caller_identity" "current" {}
-
-# resource "aws_iam_access_key" "c_user" {
-#   user = element(split("/", data.aws_caller_identity.current.arn),1)
-# }
-
 resource "aws_security_group" "boundary_demo_worker_inet" {
   name = "${var.unique_name}-inet"
   vpc_id = var.aws_vpc
@@ -189,12 +183,6 @@ resource "boundary_storage_bucket" "boundary_bucket" {
   plugin_name     = "aws"
   bucket_name     = "${var.unique_name}-bsr"
   attributes_json = jsonencode({ "region" = var.aws_region, "disable_credential_rotation" = true })
-
-  # secrets_json = jsonencode({
-  #   "access_key_id"     = data.aws_caller_identity.current.user_id,
-  #   "secret_access_key" = aws_iam_access_key.c_user.secret
-  # })
-
   secrets_json = jsonencode({
     "access_key_id"     = var.aws_id,
     "secret_access_key" = var.aws_secret
