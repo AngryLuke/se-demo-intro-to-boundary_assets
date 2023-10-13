@@ -37,3 +37,8 @@ output "app_infra_ssh_privkey" {
   description = "The raw content of the app infrastructure SSH private key."
   value = tls_private_key.aws_infra_ssh_key.private_key_openssh
 }
+
+output "aws_boundary_bucket_name" {
+  description = "value"
+  value = var.aws_bucket_name
+}

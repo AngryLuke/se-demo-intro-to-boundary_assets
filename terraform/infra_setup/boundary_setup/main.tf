@@ -6,7 +6,32 @@ terraform {
     boundary = {
       source = "hashicorp/boundary"
     }
+    hcp = {
+      source = "hashicorp/hcp"
+      version = "0.60.0"
+    }
   }
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_access_key" "c_user" {
+  user = data.aws_caller_identity.current.user_id
+}
+
+resource "boundary_storage_bucket" "boundary_bucket" {
+  name            = "Demo BSR Bucket"
+  description     = "Demo Boundary Session Recording Bucket"
+  scope_id        = "global"
+  plugin_name     = "aws"
+  bucket_name     = var.aws_bucket_name
+  attributes_json = jsonencode({ "region" = var.aws_region, "disable_credential_rotation" = true })
+
+  secrets_json = jsonencode({
+    "access_key_id"     = data.aws_caller_identity.current.user_id,
+    "secret_access_key" = aws_iam_access_key.c_user.secret
+  })
+  worker_filter = var.bsr_worker_filter
 }
 
 resource "aws_security_group" "boundary_demo_worker_inet" {
@@ -62,6 +87,7 @@ locals {
       auth_storage_path = "/etc/boundary-worker-data"
       public_addr = "file:///etc/public_dns"
       controller_generated_activation_token = "${boundary_worker.hcp_pki_instance_worker.controller_generated_activation_token}"
+      recording_storage_path = "/etc/boundary-recording-data"
 
       tags {
         type = "public_instance"
@@ -123,6 +149,7 @@ locals {
       [ "apt", "update" ],
       [ "sh", "-c", "UCF_FORCE_CONFFOLD=true apt upgrade -y" ],
       [ "mkdir", "/etc/boundary-worker-data" ],
+      [ "mkdir", "/etc/boundary-recording-data" ],
       [ "apt", "install", "-y", "bind9-dnsutils", "jq", "curl", "unzip", "docker-compose", "boundary-enterprise" ],
       [ "chown", "boundary:boundary", "/etc/boundary-worker-data" ],
       [ "sh", "-c", "curl -Ss https://checkip.amazonaws.com > /etc/public_ip" ],

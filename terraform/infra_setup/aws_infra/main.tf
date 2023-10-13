@@ -151,3 +151,14 @@ resource "aws_route_table_association" "boundary_demo_private" {
   subnet_id      = aws_subnet.boundary_demo_private.id
   route_table_id = aws_route_table.boundary_demo_private.id
 }
+
+
+## session recording bucket
+resource "aws_s3_bucket" "bsr_bucket" {
+  bucket = "${var.unique_name}-bsr"
+
+  tags = {
+    Name        = "Boundary instruqt"
+    Environment = "Demo"
+  }
+}

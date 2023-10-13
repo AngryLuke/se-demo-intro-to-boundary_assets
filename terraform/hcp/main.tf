@@ -25,6 +25,7 @@ resource "hcp_boundary_cluster" "boundary_demo" {
   cluster_id = "${substr(local.unique_name, 0, 32)}"
   username = var.boundary_admin_login
   password = random_pet.boundary_admin_password.id
+  tier = "Plus"
 }
 
 data "http" "boundary_cluster_auth_methods" {
