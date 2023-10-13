@@ -13,11 +13,11 @@ terraform {
   }
 }
 
-data "aws_caller_identity" "current" {}
+# data "aws_caller_identity" "current" {}
 
-resource "aws_iam_access_key" "c_user" {
-  user = element(split("/", data.aws_caller_identity.current.arn),1)
-}
+# resource "aws_iam_access_key" "c_user" {
+#   user = element(split("/", data.aws_caller_identity.current.arn),1)
+# }
 
 resource "aws_security_group" "boundary_demo_worker_inet" {
   name = "${var.unique_name}-inet"
@@ -136,9 +136,9 @@ locals {
       [ "sh", "-c", "UCF_FORCE_CONFFOLD=true apt upgrade -y" ],
       [ "mkdir", "/etc/boundary-worker-data" ],
       [ "mkdir", "/etc/boundary-recording-data" ],
+      [ "apt", "install", "-y", "bind9-dnsutils", "jq", "curl", "unzip", "docker-compose", "boundary-enterprise" ],
       [ "chown", "boundary:boundary", "/etc/boundary-worker-data" ],
       [ "chown", "boundary:boundary", "/etc/boundary-recording-data" ],
-      [ "apt", "install", "-y", "bind9-dnsutils", "jq", "curl", "unzip", "docker-compose", "boundary-enterprise" ],
       [ "sh", "-c", "curl -Ss https://checkip.amazonaws.com > /etc/public_ip" ],
       [ "sh", "-c", "host -t PTR $(curl -Ss https://checkip.amazonaws.com) | awk '{print substr($NF, 1, length($NF)-1)}' > /etc/public_dns" ],
       [ "systemctl", "enable", "--now", "apt-daily-upgrade.service", "apt-daily-upgrade.timer", "docker" ],
@@ -190,10 +190,16 @@ resource "boundary_storage_bucket" "boundary_bucket" {
   bucket_name     = "${var.unique_name}-bsr"
   attributes_json = jsonencode({ "region" = var.aws_region, "disable_credential_rotation" = true })
 
+  # secrets_json = jsonencode({
+  #   "access_key_id"     = data.aws_caller_identity.current.user_id,
+  #   "secret_access_key" = aws_iam_access_key.c_user.secret
+  # })
+
   secrets_json = jsonencode({
-    "access_key_id"     = data.aws_caller_identity.current.user_id,
-    "secret_access_key" = aws_iam_access_key.c_user.secret
+    "access_key_id"     = var.aws_id,
+    "secret_access_key" = var.aws_secret
   })
   worker_filter = var.bsr_worker_filter
+
   depends_on = [ time_sleep.wait_for_cloudinit ]
 }

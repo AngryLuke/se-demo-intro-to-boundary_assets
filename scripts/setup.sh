@@ -259,6 +259,9 @@ else
   echo "Re-using existing Boundary auth token."
 fi
 
+export TF_VAR_aws_id=${AWS_ACCESS_KEY_ID}
+export TF_VAR_aws_secret=${AWS_SECRET_ACCESS_KEY}
+
 cd ${TF_BASE}/infra_setup
 if ! terraform init ; then
   echo "Infrastructure workspace init failed." >&2

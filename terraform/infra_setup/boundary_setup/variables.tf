@@ -44,3 +44,11 @@ variable "bsr_worker_filter" {
    type = string
    default = "\"yes\" in \"/tags/recording\""
 }
+
+variable "aws_id" {
+  type = string
+}
+
+variable "aws_secret" {
+  type = string
+}
