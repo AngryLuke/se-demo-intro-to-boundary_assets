@@ -138,6 +138,7 @@ locals {
       [ "mkdir", "/etc/boundary-recording-data" ],
       [ "apt", "install", "-y", "bind9-dnsutils", "jq", "curl", "unzip", "docker-compose", "boundary-enterprise" ],
       [ "chown", "boundary:boundary", "/etc/boundary-worker-data" ],
+      [ "chown", "boundary:boundary", "/etc/boundary-recording-data" ],
       [ "sh", "-c", "curl -Ss https://checkip.amazonaws.com > /etc/public_ip" ],
       [ "sh", "-c", "host -t PTR $(curl -Ss https://checkip.amazonaws.com) | awk '{print substr($NF, 1, length($NF)-1)}' > /etc/public_dns" ],
       [ "systemctl", "disable", "--now", "boundary" ], 
