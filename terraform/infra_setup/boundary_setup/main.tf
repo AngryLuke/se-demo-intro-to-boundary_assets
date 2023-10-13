@@ -16,7 +16,7 @@ terraform {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_access_key" "c_user" {
-  user = data.aws_caller_identity.current.user_id
+  user = element(split("/", data.aws_caller_identity.current.arn),1)
 }
 
 resource "boundary_storage_bucket" "boundary_bucket" {
@@ -95,6 +95,7 @@ locals {
         region = "${var.aws_region}"
         unique_name = "${var.unique_name}-vm"
         exec_type = "systemd"
+        recording = "yes"
       }
     }
     WORKER_CONFIG

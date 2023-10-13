@@ -152,7 +152,6 @@ resource "aws_route_table_association" "boundary_demo_private" {
   route_table_id = aws_route_table.boundary_demo_private.id
 }
 
-
 ## session recording bucket
 resource "aws_s3_bucket" "bsr_bucket" {
   bucket = "${var.unique_name}-bsr"

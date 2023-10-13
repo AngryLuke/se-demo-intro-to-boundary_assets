@@ -42,5 +42,5 @@ variable "create_k8s" {
 
 variable "bsr_worker_filter" {
    type = string
-   default = ""
+   default = "\"yes\" in \"/tags/recording\""
 }
