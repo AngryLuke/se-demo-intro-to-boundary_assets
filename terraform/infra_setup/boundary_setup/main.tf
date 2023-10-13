@@ -19,21 +19,6 @@ resource "aws_iam_access_key" "c_user" {
   user = element(split("/", data.aws_caller_identity.current.arn),1)
 }
 
-resource "boundary_storage_bucket" "boundary_bucket" {
-  name            = "Demo BSR Bucket"
-  description     = "Demo Boundary Session Recording Bucket"
-  scope_id        = "global"
-  plugin_name     = "aws"
-  bucket_name     = "${var.unique_name}-bsr"
-  attributes_json = jsonencode({ "region" = var.aws_region, "disable_credential_rotation" = true })
-
-  secrets_json = jsonencode({
-    "access_key_id"     = data.aws_caller_identity.current.user_id,
-    "secret_access_key" = aws_iam_access_key.c_user.secret
-  })
-  worker_filter = var.bsr_worker_filter
-}
-
 resource "aws_security_group" "boundary_demo_worker_inet" {
   name = "${var.unique_name}-inet"
   vpc_id = var.aws_vpc
@@ -156,7 +141,8 @@ locals {
       [ "sh", "-c", "curl -Ss https://checkip.amazonaws.com > /etc/public_ip" ],
       [ "sh", "-c", "host -t PTR $(curl -Ss https://checkip.amazonaws.com) | awk '{print substr($NF, 1, length($NF)-1)}' > /etc/public_dns" ],
       [ "systemctl", "disable", "--now", "boundary" ], 
-      [ "systemctl", "enable", "--now", "apt-daily-upgrade.service", "apt-daily-upgrade.timer", "docker" ]
+      [ "systemctl", "enable", "--now", "apt-daily-upgrade.service", "apt-daily-upgrade.timer", "docker" ],
+      ["systemctl", "start", "boundary.service"]
     ]
   }
 }
@@ -189,4 +175,25 @@ resource "aws_instance" "boundary_worker" {
     app = "boundary"
     region = "${var.aws_region}"
   }
+}
+
+resource "time_sleep" "wait_for_cloudinit" {
+  depends_on = [aws_instance.boundary_worker]
+  create_duration = "90s"
+}
+
+resource "boundary_storage_bucket" "boundary_bucket" {
+  name            = "Demo BSR Bucket"
+  description     = "Demo Boundary Session Recording Bucket"
+  scope_id        = "global"
+  plugin_name     = "aws"
+  bucket_name     = "${var.unique_name}-bsr"
+  attributes_json = jsonencode({ "region" = var.aws_region, "disable_credential_rotation" = true })
+
+  secrets_json = jsonencode({
+    "access_key_id"     = data.aws_caller_identity.current.user_id,
+    "secret_access_key" = aws_iam_access_key.c_user.secret
+  })
+  worker_filter = var.bsr_worker_filter
+  depends_on = [ time_sleep.wait_for_cloudinit ]
 }
