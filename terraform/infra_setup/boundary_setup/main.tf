@@ -24,7 +24,7 @@ resource "boundary_storage_bucket" "boundary_bucket" {
   description     = "Demo Boundary Session Recording Bucket"
   scope_id        = "global"
   plugin_name     = "aws"
-  bucket_name     = var.aws_bucket_name
+  bucket_name     = "${var.unique_name}-bsr"
   attributes_json = jsonencode({ "region" = var.aws_region, "disable_credential_rotation" = true })
 
   secrets_json = jsonencode({

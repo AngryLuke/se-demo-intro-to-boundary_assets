@@ -51,8 +51,3 @@ variable "admin_ip_additional" {
 variable "boundary_cluster_admin_url" {
   type = string
 }
-
-variable "aws_bucket_name" {
-  type = string
-  default = "${var.unique_name}-bsr"
-}

@@ -40,5 +40,5 @@ output "app_infra_ssh_privkey" {
 
 output "aws_boundary_bucket_name" {
   description = "value"
-  value = var.aws_bucket_name
+  value = "${var.unique_name}-bsr"
 }

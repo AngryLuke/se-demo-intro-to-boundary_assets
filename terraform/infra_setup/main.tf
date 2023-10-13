@@ -43,7 +43,6 @@ module "aws_infra" {
   aws_region = var.aws_region
   aws_instance_types = local.aws_instance_types
   aws_vpc_cidr = var.aws_vpc_cidr
-  aws_bucket_name = var.aws_bucket_name
 }
 
 module "boundary_setup" {
@@ -58,7 +57,6 @@ module "boundary_setup" {
   boundary_worker_instance_type = var.aws_boundary_worker_instance_type
   boundary_worker_subnet_id = module.aws_infra.aws_subnet_public_id
   boundary_cluster_admin_url = var.boundary_cluster_admin_url
-  aws_bucket_name = var.aws_bucket_name
 }
 
 module "postgres" {

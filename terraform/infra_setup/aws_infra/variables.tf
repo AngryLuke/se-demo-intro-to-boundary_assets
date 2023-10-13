@@ -26,8 +26,3 @@ variable "aws_vpc_cidr" {
   type = string
   default = "10.11.0.0/16"
 }
-
-variable "aws_bucket_name" {
-  type = string
-  default = "${var.unique_name}-bsr"
-}

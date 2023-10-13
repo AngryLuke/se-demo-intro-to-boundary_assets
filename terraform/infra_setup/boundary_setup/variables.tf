@@ -40,11 +40,6 @@ variable "create_k8s" {
   default = true
 }
 
-variable "aws_bucket_name" {
-  type = string
-  default = "${var.unique_name}-bsr"
-}
-
 variable "bsr_worker_filter" {
    type = string
    default = ""
