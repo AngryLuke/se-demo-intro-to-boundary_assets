@@ -136,14 +136,13 @@ locals {
       [ "sh", "-c", "UCF_FORCE_CONFFOLD=true apt upgrade -y" ],
       [ "mkdir", "/etc/boundary-worker-data" ],
       [ "mkdir", "/etc/boundary-recording-data" ],
-      [ "apt", "install", "-y", "bind9-dnsutils", "jq", "curl", "unzip", "docker-compose", "boundary-enterprise" ],
       [ "chown", "boundary:boundary", "/etc/boundary-worker-data" ],
       [ "chown", "boundary:boundary", "/etc/boundary-recording-data" ],
+      [ "apt", "install", "-y", "bind9-dnsutils", "jq", "curl", "unzip", "docker-compose", "boundary-enterprise" ],
       [ "sh", "-c", "curl -Ss https://checkip.amazonaws.com > /etc/public_ip" ],
       [ "sh", "-c", "host -t PTR $(curl -Ss https://checkip.amazonaws.com) | awk '{print substr($NF, 1, length($NF)-1)}' > /etc/public_dns" ],
-      [ "systemctl", "disable", "--now", "boundary" ], 
       [ "systemctl", "enable", "--now", "apt-daily-upgrade.service", "apt-daily-upgrade.timer", "docker" ],
-      ["systemctl", "start", "boundary.service"]
+      [ "systemctl", "enable", "--now", "boundary" ] 
     ]
   }
 }
@@ -180,7 +179,7 @@ resource "aws_instance" "boundary_worker" {
 
 resource "time_sleep" "wait_for_cloudinit" {
   depends_on = [aws_instance.boundary_worker]
-  create_duration = "90s"
+  create_duration = "2m"
 }
 
 resource "boundary_storage_bucket" "boundary_bucket" {
