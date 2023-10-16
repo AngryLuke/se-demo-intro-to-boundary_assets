@@ -173,7 +173,7 @@ resource "aws_instance" "boundary_worker" {
 
 resource "time_sleep" "wait_for_cloudinit" {
   depends_on = [aws_instance.boundary_worker]
-  create_duration = "2m"
+  create_duration = "3m"
 }
 
 resource "boundary_storage_bucket" "boundary_bucket" {
