@@ -55,7 +55,7 @@ locals {
 
     listener "tcp" {
       purpose = "proxy"
-      address = "0.0.0.0"
+      address = "0.0.0.0:9202"
     }
 
     worker {
