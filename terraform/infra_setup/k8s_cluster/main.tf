@@ -40,7 +40,7 @@ locals {
   boundary_k8s_worker_config = <<-WORKER_CONFIG
     listener "tcp" {
       purpose = "proxy"
-      address = "0.0.0.0"
+      address = "0.0.0.0:9202"
     }
 
     worker {
